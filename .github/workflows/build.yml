@@ -102,18 +102,13 @@ jobs:
       - name: Generate ad-white
         run: |
           curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list
-          if [ ! -f ./domains/my-ad-white.list ]; then
-          echo "Error: my-ad-white.list not created."
-          exit 1
-          fi
-          
           grep -Fx -f ./domains/ads.list ./domains/my-ad-white.list > ./domains/duplicates.txt
-          echo "Error: not grep"
-          
           grep -Fvxf ./domains/duplicates.txt ./domains/ads.list > ./domains/ads.list.tmp
           mv ./domains/ads.list.tmp ./domains/ads.list
+          echo "Error: not ads"
           grep -Fvxf ./domains/duplicates.txt ./domains/my-ad-white.list > ./domains/my-ad-white.tmp
-          mv ./domains/my-ad-white.tmp ./domains/ad_white.list
+          mv ./domains/my-ad-white.tmp ./domains/ad-white.list
+          echo "Error: not ad-white"
           rm -rf ./domains/duplicates.txt
           rm -rf ./domains/my-ad-white.list
       - name: Generate microsoft-cn

@@ -104,11 +104,17 @@ jobs:
           curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list
           grep -Fx -f ./domains/ads.list ./domains/my-ad-white.list > ./domains/duplicates.txt
           grep -Fvxf ./domains/duplicates.txt ./domains/ads.list > ./domains/ads.list.tmp
+
+          if [ -f ./domains/ads.list.tmp ]; then
           mv ./domains/ads.list.tmp ./domains/ads.list
-          echo "Error: not ads"
+          else
+          echo "Error: ads.list.tmp not found"
+          exit 1
+          fi
+          mv ./domains/ads.list.tmp ./domains/ads.list
+          
           grep -Fvxf ./domains/duplicates.txt ./domains/my-ad-white.list > ./domains/my-ad-white.tmp
           mv ./domains/my-ad-white.tmp ./domains/ad-white.list
-          echo "Error: not ad-white"
           rm -rf ./domains/duplicates.txt
           rm -rf ./domains/my-ad-white.list
       - name: Generate microsoft-cn

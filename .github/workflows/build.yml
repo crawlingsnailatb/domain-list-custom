@@ -106,14 +106,15 @@ jobs:
           rm -f ./domains/my-ad-white.list
       - name: Generate ad-white
         run: |
-          curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list
-          grep -Fxf ./domains/ads.list ./domains/my-ad-white.list > ./domains/duplicates.txt
-          grep -Fvxf ./domains/duplicates.txt ./domains/ads.list > ./domains/ads.list.tmp
-          mv ./domains/ads.list.tmp ./domains/ads.list
-          grep -Fvxf ./domains/duplicates.txt ./domains/my-ad-white.list > ./domains/my-ad-white.tmp || echo "Failed at filtering my-ad-white.list OR  my-ad-white.list is empty"
-          mv ./domains/my-ad-white.tmp ./domains/ad-white.list
-          rm -f ./domains/duplicates.txt
-          rm -f ./domains/my-ad-white.list
+          curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list || echo "Failed at curl and sed operation"
+          grep -Fxf ./domains/ads.list ./domains/my-ad-white.list > ./domains/duplicates.txt || echo "Failed at finding duplicates"
+          grep -Fvxf ./domains/duplicates.txt ./domains/ads.list > ./domains/ads.list.tmp || echo "Failed at filtering ads.list"
+          mv ./domains/ads.list.tmp ./domains/ads.list || echo "Failed at moving ads.list.tmp to ads.list"
+          grep -Fvxf ./domains/duplicates.txt ./domains/my-ad-white.list > ./domains/my-ad-white.tmp || echo "Failed at filtering my-ad-white.list OR my-ad-white.list is empty"
+          mv ./domains/my-ad-white.tmp ./domains/ad-white.list || echo "Failed at moving my-ad-white.tmp to ad-white.list"
+          rm -f ./domains/duplicates.txt || echo "Failed at removing duplicates.txt"
+          rm -f ./domains/my-ad-white.list || echo "Failed at removing my-ad-white.list"
+
       - name: Generate microsoft-cn
         run: |
           grep '@cn$' ./publish/microsoft.txt | sed -e 's/^full:/DOMAIN,/' -e 's/^domain:/DOMAIN-SUFFIX,/' -e 's/^keyword:/DOMAIN-KEYWORD,/' -e 's/^regexp:/DOMAIN-REGEX,/' -e 's/:@cn$//' | sort --ignore-case > ./domains/microsoft-cn.list

@@ -97,8 +97,13 @@ jobs:
         run: |
           curl -sSL ${ads} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/ads.list
           curl -sSL ${ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/ad-white.list
+          curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list
           grep -Fvxf ./domains/ad-white.list ./domains/ads.list > ./domains/ads.list.tmp
           mv ./domains/ads.list.tmp ./domains/ads.list
+          grep -Fxf ./domains/ads.list ./domains/my-ad-white.list > ./domains/duplicates.txt
+          grep -Fvxf ./domains/duplicates.txt ./domains/ads.list > ./domains/ads.list.tmp
+          mv ./domains/ads.list.tmp ./domains/ads.list
+          rm -f ./domains/my-ad-white.list
       - name: Generate ad-white
         run: |
           curl -sSL ${my_ad_white} | grep -Ev '#|payload:' | sed -e '/^\s*$/d' -e "s/'$//" -e 's/^[ \t]*//' -e "s/^- '+\./DOMAIN-SUFFIX,/" -e "s/^- '/DOMAIN,/" | sort --ignore-case > ./domains/my-ad-white.list
